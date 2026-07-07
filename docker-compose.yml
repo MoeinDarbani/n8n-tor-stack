@@ -1,0 +1,68 @@
+services:
+
+  tor:
+    build:
+      context: ./tor
+
+    restart: unless-stopped
+
+    expose:
+      - "9050"
+
+    networks:
+      - proxy-network
+
+
+  privoxy:
+    build:
+      context: ./privoxy
+
+    depends_on:
+      - tor
+
+    restart: unless-stopped
+
+    expose:
+      - "8118"
+
+    networks:
+      - proxy-network
+
+
+  n8n:
+    image: n8nio/n8n:latest
+
+    restart: unless-stopped
+
+    ports:
+      - "5678:5678"
+
+    environment:
+      N8N_HOST: localhost
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+
+      NODE_ENV: production
+
+      N8N_SECURE_COOKIE: false
+      WEBHOOK_URL: http://localhost:5678/
+
+      HTTP_PROXY: http://privoxy:8118
+      HTTPS_PROXY: http://privoxy:8118
+
+      NO_PROXY: localhost,127.0.0.1
+
+    volumes:
+      - ./n8n/data:/home/node/.n8n
+
+    depends_on:
+      - privoxy
+
+    networks:
+      - proxy-network
+
+
+networks:
+
+  proxy-network:
+    driver: bridge

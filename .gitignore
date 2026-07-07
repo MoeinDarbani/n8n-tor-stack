@@ -1,0 +1,19 @@
+# Environment files
+.env
+
+# n8n persistent data
+n8n/data/*
+
+# Logs
+*.log
+
+# Docker files
+*.pid
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
