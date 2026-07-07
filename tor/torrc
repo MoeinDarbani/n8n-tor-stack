@@ -1,7 +1,7 @@
 SocksPort 0.0.0.0:9050
 
-Log notice stdout
-
 DataDirectory /var/lib/tor
+
+Log notice stdout
 
 AvoidDiskWrites 1
