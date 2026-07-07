@@ -28,7 +28,7 @@ services:
       - tor
 
     ports:
-      - "8080:8118"
+      - "8888:8118"
 
     restart: unless-stopped
 
