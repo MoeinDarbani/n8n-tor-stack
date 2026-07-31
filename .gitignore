@@ -4,8 +4,24 @@
 # n8n persistent data
 n8n/data/*
 
+# Database files
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
 # Logs
 *.log
+
+# Backups
+*.tar.gz
+*.zip
+*.bak
+
+# SSL certificates and private keys
+*.key
+*.pem
+*.crt
+*.cer
 
 # Docker files
 *.pid
