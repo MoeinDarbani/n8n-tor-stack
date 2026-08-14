@@ -1,8 +1,64 @@
+name: n8n-tor-stack
+
 services:
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+
+    depends_on:
+      privoxy:
+        condition: service_started
+
+    environment:
+      HTTP_PROXY: http://privoxy:8118
+      HTTPS_PROXY: http://privoxy:8118
+      NO_PROXY: localhost,127.0.0.1
+
+      N8N_HOST: localhost
+      N8N_PORT: "5678"
+      N8N_PROTOCOL: http
+      N8N_SECURE_COOKIE: "false"
+      WEBHOOK_URL: http://localhost:5678/
+
+      NODE_ENV: production
+
+    ports:
+      - "5678:5678"
+
+    volumes:
+      - /opt/docker/stacks/n8n-tor-stack/n8n/data:/home/node/.n8n
+
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 10s
+
+    networks:
+      - default
+
+
+  privoxy:
+    build:
+      context: /opt/docker/stacks/n8n-tor-stack/privoxy
+      dockerfile: Dockerfile
+
+    container_name: privoxy
+
+    depends_on:
+      tor:
+        condition: service_started
+
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 10s
+
+    networks:
+      - default
+
 
   tor:
     build:
-      context: ./tor
+      context: /opt/docker/stacks/n8n-tor-stack/tor
       dockerfile: Dockerfile
 
     container_name: tor-proxy
@@ -10,63 +66,14 @@ services:
     expose:
       - "9050"
 
-    restart: unless-stopped
-
     init: true
-
+    restart: unless-stopped
     stop_grace_period: 30s
 
-
-  privoxy:
-    build:
-      context: ./privoxy
-      dockerfile: Dockerfile
-
-    container_name: privoxy
-
-    depends_on:
-      - tor
-
-    ports:
-      - "8888:8118"
-
-    restart: unless-stopped
-
-    init: true
-
-    stop_grace_period: 10s
+    networks:
+      - default
 
 
-  n8n:
-    image: n8nio/n8n:latest
-
-    container_name: n8n
-
-    depends_on:
-      - privoxy
-
-    ports:
-      - "5678:5678"
-
-    environment:
-      - NODE_ENV=production
-
-      - N8N_HOST=localhost
-      - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-
-      - N8N_SECURE_COOKIE=false
-      - WEBHOOK_URL=http://localhost:5678/
-
-      - HTTP_PROXY=http://privoxy:8118
-      - HTTPS_PROXY=http://privoxy:8118
-      - NO_PROXY=localhost,127.0.0.1
-
-    volumes:
-      - ./n8n/data:/home/node/.n8n
-
-    restart: unless-stopped
-
-    init: true
-
-    stop_grace_period: 10s
+networks:
+  default:
+    name: n8n-tor-stack_default
