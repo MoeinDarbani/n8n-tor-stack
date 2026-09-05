@@ -219,7 +219,7 @@ docker compose version
 ## Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/n8n-tor-stack.git
+git clone https://github.com/MoeinDarbani/n8n-tor-stack.git
 
 cd n8n-tor-stack
 ```
